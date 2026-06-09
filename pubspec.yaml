@@ -1,11 +1,11 @@
-name: flutter_datachannel
+name: dart_datachannel
 description: >-
   Dart FFI package over libdatachannel (no Flutter SDK dependency).
   Client-only, server-only, and hybrid WebRTC data-channel modes.
 version: 0.1.0
-homepage: https://github.com/idrto/flutter_datachannel
-repository: https://github.com/idrto/flutter_datachannel
-issue_tracker: https://github.com/idrto/flutter_datachannel/issues
+homepage: https://github.com/idrto/dart_datachannel
+repository: https://github.com/idrto/dart_datachannel
+issue_tracker: https://github.com/idrto/dart_datachannel/issues
 
 environment:
   sdk: ^3.5.0

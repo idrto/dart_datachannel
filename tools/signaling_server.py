@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Minimal WebSocket signaling server for flutter_datachannel.
+Minimal WebSocket signaling server for dart_datachannel.
 
 Protocol (JSON over WebSocket):
   register      — {type, peer_id, role: client|server|hybrid}
@@ -127,7 +127,7 @@ async def main(host: str, port: int) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="flutter_datachannel signaling server")
+    parser = argparse.ArgumentParser(description="dart_datachannel signaling server")
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("-v", "--verbose", action="store_true")

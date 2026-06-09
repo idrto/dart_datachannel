@@ -1,6 +1,6 @@
 # Testing Guide
 
-Platform test matrix for **flutter_datachannel** v0.1 (libdatachannel backend).
+Platform test matrix for **dart_datachannel** v0.1 (libdatachannel backend).
 
 ## Test environment setup
 
@@ -167,4 +167,4 @@ Include:
 - Signaling server logs
 - ICE failure? STUN/TURN config used
 
-File at: https://github.com/idrto/flutter_datachannel/issues
+File at: https://github.com/idrto/dart_datachannel/issues

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_datachannel/flutter_datachannel.dart';
+import 'package:dart_datachannel/dart_datachannel.dart';
 
 /// Pure Dart CLI client — no Flutter SDK required.
 ///
@@ -14,7 +14,7 @@ Future<void> main(List<String> args) async {
   final opts = _parseArgs(args);
 
   // Point at repo native build when running from source tree.
-  final repoLib = File('native/build/libflutter_datachannel.so');
+  final repoLib = File('native/build/libdart_datachannel.so');
   if (repoLib.existsSync()) {
     configureNativeLibrary(repoLib.absolute.path);
   }

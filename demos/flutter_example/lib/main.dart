@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_datachannel/flutter_datachannel.dart';
+import 'package:dart_datachannel/dart_datachannel.dart';
 
 void main() {
   // When running from the repo, use the prebuilt native library.
   for (final relative in [
-    '../../native/build/libflutter_datachannel.so',
-    '../../native/build/libflutter_datachannel.dylib',
-    '../../native/build/flutter_datachannel.dll',
+    '../../native/build/libdart_datachannel.so',
+    '../../native/build/libdart_datachannel.dylib',
+    '../../native/build/dart_datachannel.dll',
   ]) {
     final file = File(relative);
     if (file.existsSync()) {

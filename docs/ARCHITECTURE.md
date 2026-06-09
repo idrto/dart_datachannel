@@ -113,10 +113,10 @@ The published package has **no Flutter plugin**. Consumers build `native/` via `
 
 | Platform | Artifact |
 |----------|----------|
-| Linux | `libflutter_datachannel.so` |
-| macOS | `libflutter_datachannel.dylib` |
-| Windows | `flutter_datachannel.dll` |
-| Android | `libflutter_datachannel.so` per ABI |
+| Linux | `libdart_datachannel.so` |
+| macOS | `libdart_datachannel.dylib` |
+| Windows | `dart_datachannel.dll` |
+| Android | `libdart_datachannel.so` per ABI |
 | iOS | Static `fdc_ffi` linked into app |
 
 ## Extension points

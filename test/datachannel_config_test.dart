@@ -1,4 +1,4 @@
-import 'package:flutter_datachannel/flutter_datachannel.dart';
+import 'package:dart_datachannel/dart_datachannel.dart';
 import 'package:test/test.dart';
 
 void main() {

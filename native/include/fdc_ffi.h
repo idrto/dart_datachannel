@@ -1,5 +1,5 @@
 /**
- * flutter_datachannel — thin C FFI layer over libdatachannel.
+ * dart_datachannel — thin C FFI layer over libdatachannel.
  *
  * Supports three runtime modes:
  *   FDC_MODE_CLIENT  — initiate outgoing connections only

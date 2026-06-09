@@ -13,5 +13,5 @@ cmake --build "${BUILD_DIR}" -j"$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/
 
 echo ""
 echo "Built:"
-echo "  Shared lib : ${BUILD_DIR}/libflutter_datachannel.so (or .dylib / .dll)"
+echo "  Shared lib : ${BUILD_DIR}/libdart_datachannel.so (or .dylib / .dll)"
 echo "  Server bin : ${BUILD_DIR}/fdc-server"

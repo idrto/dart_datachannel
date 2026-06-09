@@ -6,7 +6,7 @@ const String nativeLibraryEnvVar = 'FDC_NATIVE_LIB';
 
 String? _configuredLibraryPath;
 
-/// Override the path used to load the native `libflutter_datachannel` library.
+/// Override the path used to load the native `libdart_datachannel` library.
 ///
 /// Call this before creating a [DataChannelEngine] when the library is not on
 /// the default search path (e.g. bundled inside a Flutter app).
@@ -25,20 +25,20 @@ DynamicLibrary? debugNativeLibraryOverride;
 /// Default shared-library file name per platform.
 String defaultNativeLibraryName() {
   if (Platform.isAndroid || Platform.isLinux) {
-    return 'libflutter_datachannel.so';
+    return 'libdart_datachannel.so';
   }
   if (Platform.isMacOS) {
-    return 'libflutter_datachannel.dylib';
+    return 'libdart_datachannel.dylib';
   }
   if (Platform.isWindows) {
-    return 'flutter_datachannel.dll';
+    return 'dart_datachannel.dll';
   }
   if (Platform.isIOS) {
     // iOS: static link — symbols live in the process image.
     return '';
   }
   throw UnsupportedError(
-    'flutter_datachannel is not supported on ${Platform.operatingSystem}',
+    'dart_datachannel is not supported on ${Platform.operatingSystem}',
   );
 }
 
@@ -49,6 +49,8 @@ List<String> nativeLibrarySearchPaths() {
 
   final candidates = <String>[
     name,
+    // Legacy name from before dart_datachannel rename
+    if (name.contains('dart_datachannel')) 'libflutter_datachannel.so',
     'native/build/$name',
     '../native/build/$name',
     '../../native/build/$name',

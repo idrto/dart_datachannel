@@ -1,4 +1,4 @@
-name: flutter_datachannel_example
+name: dart_datachannel_example
 description: Pure Dart CLI client for flutter_datachannel.
 publish_to: 'none'
 version: 0.1.0
@@ -7,7 +7,7 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
-  flutter_datachannel:
+  dart_datachannel:
     path: ../
 
 dev_dependencies:

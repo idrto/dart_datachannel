@@ -65,7 +65,7 @@ if(WIN32)
 endif()
 
 set_target_properties(fdc_ffi PROPERTIES
-    OUTPUT_NAME "flutter_datachannel"
+    OUTPUT_NAME "dart_datachannel"
     VERSION ${PROJECT_VERSION}
     SOVERSION 0
 )

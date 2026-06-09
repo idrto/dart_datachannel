@@ -1,4 +1,4 @@
-# flutter_datachannel
+# dart_datachannel
 
 **Pure Dart** FFI package over [libdatachannel](https://github.com/paullouisageneau/libdatachannel) — no Flutter SDK dependency. Use from CLI, servers, or Flutter apps (Flutter consumers bundle the native `.so`/`.dylib`/`.dll` themselves; see [docs/FLUTTER_EMBEDDING.md](docs/FLUTTER_EMBEDDING.md)).
 
@@ -16,9 +16,9 @@
 
 ```yaml
 dependencies:
-  flutter_datachannel:
+  dart_datachannel:
     git:
-      url: https://github.com/idrto/flutter_datachannel
+      url: https://github.com/idrto/dart_datachannel
       ref: main
 ```
 
@@ -99,7 +99,7 @@ Or embed in your app — see [docs/FLUTTER_EMBEDDING.md](docs/FLUTTER_EMBEDDING.
 ```bash
 ./scripts/build_native.sh
 # Produces:
-#   native/build/libflutter_datachannel.so
+#   native/build/libdart_datachannel.so
 #   native/build/fdc-server
 ```
 

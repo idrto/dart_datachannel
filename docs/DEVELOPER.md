@@ -1,6 +1,6 @@
 # Developer Guide
 
-This document covers building, integrating, and extending **flutter_datachannel**.
+This document covers building, integrating, and extending **dart_datachannel**.
 
 ## Table of contents
 
@@ -22,9 +22,9 @@ This document covers building, integrating, and extending **flutter_datachannel*
 ## Repository layout
 
 ```
-flutter_datachannel/
+dart_datachannel/
 ├── lib/                    # Dart package (pub.dev ready)
-│   ├── flutter_datachannel.dart
+│   ├── dart_datachannel.dart
 │   └── src/
 │       ├── datachannel_client.dart   # Client-only facade
 │       ├── datachannel_server.dart   # Server-only facade
@@ -92,9 +92,9 @@ Artifacts:
 
 | File | Purpose |
 |------|---------|
-| `native/build/libflutter_datachannel.so` | Linux shared lib |
-| `native/build/libflutter_datachannel.dylib` | macOS shared lib |
-| `native/build/flutter_datachannel.dll` | Windows DLL |
+| `native/build/libdart_datachannel.so` | Linux shared lib |
+| `native/build/libdart_datachannel.dylib` | macOS shared lib |
+| `native/build/dart_datachannel.dll` | Windows DLL |
 | `native/build/fdc-server` | Standalone server-only service |
 
 ### Pure Dart CLI example
@@ -193,18 +193,18 @@ The package is **Dart-only**. Flutter apps add it as a normal dependency and bun
 
 ```yaml
 dependencies:
-  flutter_datachannel:
+  dart_datachannel:
     git:
-      url: https://github.com/idrto/flutter_datachannel
+      url: https://github.com/idrto/dart_datachannel
       ref: main
 ```
 
 ### Native library path
 
 ```dart
-import 'package:flutter_datachannel/flutter_datachannel.dart';
+import 'package:dart_datachannel/dart_datachannel.dart';
 
-configureNativeLibrary('/path/to/libflutter_datachannel.so');
+configureNativeLibrary('/path/to/libdart_datachannel.so');
 // or: FDC_NATIVE_LIB=/path/to/lib.so
 ```
 
@@ -380,7 +380,7 @@ On error:
 ### Linux
 
 - Requires `libssl-dev` (OpenSSL)
-- Flutter bundles `libflutter_datachannel.so` via `linux/CMakeLists.txt`
+- Flutter bundles `libdart_datachannel.so` via `linux/CMakeLists.txt`
 
 ### macOS
 
