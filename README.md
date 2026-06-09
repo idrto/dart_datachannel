@@ -1,6 +1,6 @@
 # flutter_datachannel
 
-Thin FFI layer over [libdatachannel](https://github.com/paullouisageneau/libdatachannel) for Flutter. Connect clients on **iOS, Android, Windows, macOS, and Linux** to a desktop **Ollama server** over WebRTC data channels.
+**Pure Dart** FFI package over [libdatachannel](https://github.com/paullouisageneau/libdatachannel) — no Flutter SDK dependency. Use from CLI, servers, or Flutter apps (Flutter consumers bundle the native `.so`/`.dylib`/`.dll` themselves; see [docs/FLUTTER_EMBEDDING.md](docs/FLUTTER_EMBEDDING.md)).
 
 ## Modes
 
@@ -44,31 +44,17 @@ On the machine running Ollama (e.g. M4 Mac):
   --ollama http://127.0.0.1:11434
 ```
 
-### 4. Connect from Flutter client
+### 4. Connect from Dart client (CLI — no Flutter)
 
-```dart
-import 'package:flutter_datachannel/flutter_datachannel.dart';
-
-final client = DataChannelClient(
-  signalingUrl: 'ws://YOUR_LAN_IP:8765',
-  peerId: 'laptop-client',
-);
-
-await client.start();
-await client.refreshServers();
-await client.connectToServer('m4-ollama');
-
-client.onMessage.listen((event) {
-  final response = parseOllamaResponse(event);
-  if (response != null) print(response['body']);
-});
-
-await client.queryOllama('m4-ollama', body: {
-  'model': 'llama3',
-  'prompt': 'Hello from Flutter',
-  'stream': false,
-});
+```bash
+./scripts/build_native.sh
+dart run example/bin/client.dart \
+  --signaling ws://127.0.0.1:8765 \
+  --server m4-ollama \
+  --prompt "Hello"
 ```
+
+Or embed in your app — see [docs/FLUTTER_EMBEDDING.md](docs/FLUTTER_EMBEDDING.md) for Flutter.
 
 ## Architecture
 
@@ -100,13 +86,13 @@ await client.queryOllama('m4-ollama', body: {
 
 ## Platform support
 
-| Platform | Client | Server (`fdc-server`) | Flutter plugin |
-|----------|--------|----------------------|----------------|
+| Platform | Client | Server (`fdc-server`) | Dart package |
+|----------|--------|----------------------|--------------|
 | Linux | ✅ | ✅ | ✅ |
 | macOS | ✅ | ✅ | ✅ |
 | Windows | ✅ | ✅ | ✅ |
-| Android | ✅ | optional | ✅ |
-| iOS | ✅ | optional | ✅ |
+| Android | ✅ | optional | ✅ (bundle `.so`) |
+| iOS | ✅ | optional | ✅ (static link) |
 
 ## Building native code
 
@@ -117,7 +103,7 @@ await client.queryOllama('m4-ollama', body: {
 #   native/build/fdc-server
 ```
 
-Flutter apps build the shared library automatically via the plugin CMake hooks.
+Flutter apps must bundle the native library — see [docs/FLUTTER_EMBEDDING.md](docs/FLUTTER_EMBEDDING.md). Optional UI demo: `demos/flutter_example/`.
 
 ## Regenerate FFI bindings
 

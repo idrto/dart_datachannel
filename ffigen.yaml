@@ -1,5 +1,5 @@
 # Run: dart run ffigen --config ffigen.yaml
-name: FlutterDatachannelBindings
+name: DatachannelBindings
 description: Auto-generated FFI bindings for fdc_ffi.h
 output: 'lib/src/ffi/bindings.g.dart'
 silence-enum-warning: true

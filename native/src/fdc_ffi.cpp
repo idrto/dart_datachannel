@@ -49,18 +49,35 @@ bool modeAllowsServer(FdcMode mode) {
 
 } // namespace
 
+struct PendingCandidate {
+    std::string candidate;
+    std::string mid;
+};
+
 struct PeerEntry {
     std::string peerId;
     std::shared_ptr<rtc::PeerConnection> pc;
     std::shared_ptr<rtc::DataChannel> dc;
     FdcPeerState state = FDC_PEER_DISCONNECTED;
     bool isInitiator = false;
+    bool hasRemoteDescription = false;
+    std::vector<PendingCandidate> pendingCandidates;
 };
 
 struct FdcContext {
     FdcConfig config{};
     FdcCallbacks callbacks{};
     void *userData = nullptr;
+
+    // Own config strings (Dart FFI frees caller buffers after fdc_create).
+    std::string ownedSignalingUrl;
+    std::string ownedPeerId;
+    std::string ownedStunServer;
+    std::string ownedTurnServer;
+    std::string ownedTurnUsername;
+    std::string ownedTurnPassword;
+    std::string ownedOllamaUrl;
+    std::string ownedDataChannelLabel;
 
     std::mutex mutex;
     FdcRuntimeState runtimeState = FDC_STATE_STOPPED;
@@ -72,6 +89,7 @@ struct FdcContext {
     std::map<std::string, PeerEntry> peers;
     std::vector<std::string> iceServersStorage;
     std::vector<const char *> iceServerPtrs;
+    std::string callbackScratch;
 
     void setError(const std::string &msg) {
         lastError = msg;
@@ -236,6 +254,29 @@ struct FdcContext {
         });
     }
 
+    void flushPendingCandidates(PeerEntry &entry) {
+        for (const auto &pending : entry.pendingCandidates) {
+            rtc::Candidate cand(pending.candidate, pending.mid);
+            entry.pc->addRemoteCandidate(cand);
+        }
+        entry.pendingCandidates.clear();
+    }
+
+    void setRemoteDescription(PeerEntry &entry, rtc::Description desc) {
+        entry.pc->setRemoteDescription(desc);
+        entry.hasRemoteDescription = true;
+        flushPendingCandidates(entry);
+    }
+
+    void addRemoteCandidate(PeerEntry &entry, const std::string &candStr, const std::string &mid) {
+        if (!entry.hasRemoteDescription) {
+            entry.pendingCandidates.push_back({candStr, mid});
+            return;
+        }
+        rtc::Candidate cand(candStr, mid);
+        entry.pc->addRemoteCandidate(cand);
+    }
+
     PeerEntry *createPeer(const std::string &peerId, bool initiator) {
         auto rtcConfig = buildRtcConfig();
         PeerEntry entry;
@@ -266,13 +307,14 @@ struct FdcContext {
 
         const std::string type = msg.value("type", "");
         if (type == "peers") {
+            callbackScratch = json;
             FdcOnPeersUpdated cb = callbacks.on_peers_updated;
             if (cb)
-                cb(userData, json.c_str());
+                cb(userData, callbackScratch.c_str());
             return;
         }
 
-        if (type == "offer" || type == "answer") {
+        if (type == "offer") {
             if (!modeAllowsServer(config.mode))
                 return;
 
@@ -290,9 +332,27 @@ struct FdcContext {
                 entry = &it->second;
             }
 
-            rtc::Description desc(sdp, type == "offer" ? rtc::Description::Type::Offer
-                                                       : rtc::Description::Type::Answer);
-            entry->pc->setRemoteDescription(desc);
+            rtc::Description desc(sdp, rtc::Description::Type::Offer);
+            setRemoteDescription(*entry, std::move(desc));
+            return;
+        }
+
+        if (type == "answer") {
+            if (!modeAllowsClient(config.mode))
+                return;
+
+            std::string remoteId = msg.value("from", "");
+            std::string sdp = msg.value("sdp", "");
+            if (remoteId.empty() || sdp.empty())
+                return;
+
+            std::lock_guard<std::mutex> lock(mutex);
+            auto it = peers.find(remoteId);
+            if (it == peers.end())
+                return;
+
+            rtc::Description desc(sdp, rtc::Description::Type::Answer);
+            setRemoteDescription(it->second, std::move(desc));
             return;
         }
 
@@ -307,8 +367,7 @@ struct FdcContext {
             auto it = peers.find(remoteId);
             if (it == peers.end())
                 return;
-            rtc::Candidate cand(candStr, mid);
-            it->second.pc->addRemoteCandidate(cand);
+            addRemoteCandidate(it->second, candStr, mid);
             return;
         }
 
@@ -339,7 +398,29 @@ FdcContext *fdc_create(const FdcConfig *config) {
     gInstanceCount++;
 
     auto *ctx = new FdcContext();
-    ctx->config = *config;
+    auto dup = [](const char *s) { return std::string(s ? s : ""); };
+    ctx->ownedSignalingUrl = dup(config->signaling_url);
+    ctx->ownedPeerId = dup(config->peer_id);
+    ctx->ownedStunServer = dup(config->stun_server);
+    ctx->ownedTurnServer = dup(config->turn_server);
+    ctx->ownedTurnUsername = dup(config->turn_username);
+    ctx->ownedTurnPassword = dup(config->turn_password);
+    ctx->ownedOllamaUrl = dup(config->ollama_url);
+    ctx->ownedDataChannelLabel = dup(config->data_channel_label);
+
+    ctx->config.mode = config->mode;
+    ctx->config.signaling_url = ctx->ownedSignalingUrl.c_str();
+    ctx->config.peer_id = ctx->ownedPeerId.c_str();
+    ctx->config.stun_server = ctx->ownedStunServer.empty() ? nullptr : ctx->ownedStunServer.c_str();
+    ctx->config.turn_server = ctx->ownedTurnServer.empty() ? nullptr : ctx->ownedTurnServer.c_str();
+    ctx->config.turn_username =
+        ctx->ownedTurnUsername.empty() ? nullptr : ctx->ownedTurnUsername.c_str();
+    ctx->config.turn_password =
+        ctx->ownedTurnPassword.empty() ? nullptr : ctx->ownedTurnPassword.c_str();
+    ctx->config.ollama_url = ctx->ownedOllamaUrl.empty() ? nullptr : ctx->ownedOllamaUrl.c_str();
+    ctx->config.data_channel_label =
+        ctx->ownedDataChannelLabel.empty() ? nullptr : ctx->ownedDataChannelLabel.c_str();
+    ctx->config.verbose_logging = config->verbose_logging;
 
     if (config->verbose_logging)
         rtc::InitLogger(rtc::LogLevel::Debug);

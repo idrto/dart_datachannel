@@ -107,17 +107,17 @@ Server-side `OllamaProxy` uses a minimal HTTP/1.1 client over BSD sockets:
 
 Future: chunked streaming for `stream: true` Ollama responses.
 
-## Flutter plugin packaging
+## Native library packaging (Dart-only package)
 
-Each platform's `CMakeLists.txt` adds `native/` as a subdirectory and exports the built library via `flutter_*_bundled_libraries` for the Flutter tool to bundle.
+The published package has **no Flutter plugin**. Consumers build `native/` via `./scripts/build_native.sh` and bundle the shared library. Flutter apps follow [FLUTTER_EMBEDDING.md](FLUTTER_EMBEDDING.md).
 
-| Platform | Linking |
-|----------|---------|
+| Platform | Artifact |
+|----------|----------|
 | Linux | `libflutter_datachannel.so` |
 | macOS | `libflutter_datachannel.dylib` |
 | Windows | `flutter_datachannel.dll` |
 | Android | `libflutter_datachannel.so` per ABI |
-| iOS | Static `fdc_ffi` linked into Runner |
+| iOS | Static `fdc_ffi` linked into app |
 
 ## Extension points
 

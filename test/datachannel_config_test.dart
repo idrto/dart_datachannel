@@ -1,5 +1,5 @@
 import 'package:flutter_datachannel/flutter_datachannel.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('DataChannelConfig', () {
@@ -31,6 +31,14 @@ void main() {
     test('parses servers list', () {
       const event = PeersUpdatedEvent('{"type":"peers","servers":["a","b"]}');
       expect(parseServerPeers(event), ['a', 'b']);
+    });
+  });
+
+  group('nativeLibrarySearchPaths', () {
+    test('includes configured path first', () {
+      configureNativeLibrary('/custom/lib.so');
+      addTearDown(resetNativeLibraryConfiguration);
+      expect(nativeLibrarySearchPaths().first, '/custom/lib.so');
     });
   });
 }

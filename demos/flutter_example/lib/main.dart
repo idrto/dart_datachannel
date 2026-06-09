@@ -1,7 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_datachannel/flutter_datachannel.dart';
 
-void main() => runApp(const ExampleApp());
+void main() {
+  // When running from the repo, use the prebuilt native library.
+  for (final relative in [
+    '../../native/build/libflutter_datachannel.so',
+    '../../native/build/libflutter_datachannel.dylib',
+    '../../native/build/flutter_datachannel.dll',
+  ]) {
+    final file = File(relative);
+    if (file.existsSync()) {
+      configureNativeLibrary(file.absolute.path);
+      break;
+    }
+  }
+  runApp(const ExampleApp());
+}
 
 class ExampleApp extends StatelessWidget {
   const ExampleApp({super.key});

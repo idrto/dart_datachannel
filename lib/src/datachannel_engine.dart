@@ -12,6 +12,15 @@ import 'ffi/native_library.dart';
 
 Pointer<Char> _cstr(String value) => value.toNativeUtf8().cast<Char>();
 
+String? _readCString(Pointer<Char>? ptr) {
+  if (ptr == null || ptr == nullptr) return null;
+  try {
+    return ptr.cast<Utf8>().toDartString();
+  } catch (_) {
+    return null;
+  }
+}
+
 /// Core WebRTC data-channel engine backed by libdatachannel via FFI.
 ///
 /// Use [DataChannelClient], [DataChannelServer], or [DataChannelHybrid]
@@ -20,8 +29,7 @@ class DataChannelEngine {
   DataChannelEngine._(this.config);
 
   final DataChannelConfig config;
-  final FlutterDatachannelBindings _bindings =
-      FlutterDatachannelBindings(nativeLibrary);
+  final DatachannelBindings _bindings = DatachannelBindings(nativeLibrary);
 
   Pointer<FdcContext>? _ctx;
   bool _started = false;
@@ -125,7 +133,7 @@ class DataChannelEngine {
         _runtimeController.add(
           RuntimeStateEvent(
             _mapRuntimeState(FdcRuntimeState.fromValue(state)),
-            message == nullptr ? null : message.cast<Utf8>().toDartString(),
+            _readCString(message),
           ),
         );
       },
@@ -135,7 +143,7 @@ class DataChannelEngine {
       (Pointer<Void> _, Pointer<Char> peerId, int state) {
         _peerController.add(
           PeerStateEvent(
-            peerId.cast<Utf8>().toDartString(),
+            _readCString(peerId) ?? 'unknown',
             _mapPeerState(FdcPeerState.fromValue(state)),
           ),
         );
@@ -146,21 +154,24 @@ class DataChannelEngine {
       (Pointer<Void> _, Pointer<Char> peerId, Pointer<Uint8> data, int len) {
         final bytes = data.asTypedList(len);
         _messageController.add(
-          PeerMessageEvent(peerId.cast<Utf8>().toDartString(), List<int>.from(bytes)),
+          PeerMessageEvent(_readCString(peerId) ?? 'unknown', List<int>.from(bytes)),
         );
       },
     );
 
     _peersCallable = NativeCallable<FdcOnPeersUpdatedFunction>.listener(
       (Pointer<Void> _, Pointer<Char> json) {
-        _peersController.add(PeersUpdatedEvent(json.cast<Utf8>().toDartString()));
+        final peersJson = _readCString(json);
+        if (peersJson != null) {
+          _peersController.add(PeersUpdatedEvent(peersJson));
+        }
       },
     );
 
     _logCallable = NativeCallable<FdcOnLogFunction>.listener(
       (Pointer<Void> _, int level, Pointer<Char> message) {
         _logController.add(
-          NativeLogEvent(level, message.cast<Utf8>().toDartString()),
+          NativeLogEvent(level, _readCString(message) ?? ''),
         );
       },
     );
@@ -318,7 +329,9 @@ class DataChannelException implements Exception {
 
 /// Parse [PeersUpdatedEvent.peersJson] into a list of server peer IDs.
 List<String> parseServerPeers(PeersUpdatedEvent event) {
-  final map = jsonDecode(event.peersJson) as Map<String, dynamic>;
+  final text = event.peersJson.trim();
+  if (!text.startsWith('{')) return const [];
+  final map = jsonDecode(text) as Map<String, dynamic>;
   final servers = map['servers'];
   if (servers is List) {
     return servers.map((e) => e.toString()).toList();

@@ -39,9 +39,9 @@ flutter_datachannel/
 │   └── server/src/main.cpp # Standalone fdc-server binary
 ├── tools/
 │   └── signaling_server.py # Reference signaling broker
-├── linux/ windows/ macos/ android/ ios/  # Flutter plugin CMake
+├── example/bin/client.dart # Pure Dart CLI (no Flutter)
+├── demos/flutter_example/  # Optional Flutter UI demo
 ├── docs/
-├── example/
 └── scripts/build_native.sh
 ```
 
@@ -56,10 +56,13 @@ flutter_datachannel/
 - OpenSSL development headers
 - Git (for FetchContent dependencies)
 
-### Flutter development
+### Dart development
 
-- Flutter SDK ≥ 3.24
 - Dart SDK ≥ 3.5
+
+### Optional Flutter UI demo
+
+- Flutter SDK ≥ 3.24 (only for `demos/flutter_example/`, not the package itself)
 
 ### Signaling (Python reference server)
 
@@ -94,13 +97,22 @@ Artifacts:
 | `native/build/flutter_datachannel.dll` | Windows DLL |
 | `native/build/fdc-server` | Standalone server-only service |
 
-### Flutter plugin (builds native code automatically)
+### Pure Dart CLI example
 
 ```bash
-cd example
-flutter pub get
-flutter run -d linux   # or macos, windows, android, ios
+./scripts/build_native.sh
+dart run example/bin/client.dart --signaling ws://127.0.0.1:8765 --server test-server
 ```
+
+### Optional Flutter demo
+
+```bash
+cd demos/flutter_example
+flutter pub get
+flutter run -d linux
+```
+
+See [FLUTTER_EMBEDDING.md](FLUTTER_EMBEDDING.md) for bundling the native library in your own Flutter app.
 
 ### Regenerate Dart FFI bindings
 
@@ -175,6 +187,8 @@ Create `~/Library/LaunchAgents/com.idrto.fdc-server.plist` pointing to the binar
 
 ## Flutter integration
 
+The package is **Dart-only**. Flutter apps add it as a normal dependency and bundle the native library. Full guide: [FLUTTER_EMBEDDING.md](FLUTTER_EMBEDDING.md).
+
 ### pubspec.yaml (Git dependency)
 
 ```yaml
@@ -183,6 +197,15 @@ dependencies:
     git:
       url: https://github.com/idrto/flutter_datachannel
       ref: main
+```
+
+### Native library path
+
+```dart
+import 'package:flutter_datachannel/flutter_datachannel.dart';
+
+configureNativeLibrary('/path/to/libflutter_datachannel.so');
+// or: FDC_NATIVE_LIB=/path/to/lib.so
 ```
 
 ### Client-only (mobile / laptop)
@@ -426,7 +449,7 @@ fdc-server --verbose ...
 1. Change `native/include/fdc_ffi.h`
 2. Run `dart run ffigen --config ffigen.yaml`
 3. Update Dart wrappers in `lib/src/`
-4. Run `./scripts/build_native.sh` and `flutter test`
+4. Run `./scripts/build_native.sh` and `dart test`
 5. Update docs in `docs/`
 
 ## webrtc.rs (future)

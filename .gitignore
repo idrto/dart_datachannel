@@ -40,6 +40,9 @@ Thumbs.db
 *.env
 .env.*
 example/android/local.properties
+demos/flutter_example/build/
+demos/flutter_example/.dart_tool/
+example/.dart_tool/
 
 # Coverage
 coverage/

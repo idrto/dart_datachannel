@@ -1,7 +1,7 @@
 name: flutter_datachannel
 description: >-
-  Thin FFI layer over libdatachannel for Flutter. Supports client-only,
-  server-only, and hybrid WebRTC data-channel modes for remote Ollama access.
+  Dart FFI package over libdatachannel (no Flutter SDK dependency).
+  Client-only, server-only, and hybrid WebRTC data-channel modes.
 version: 0.1.0
 homepage: https://github.com/idrto/flutter_datachannel
 repository: https://github.com/idrto/flutter_datachannel
@@ -9,33 +9,15 @@ issue_tracker: https://github.com/idrto/flutter_datachannel/issues
 
 environment:
   sdk: ^3.5.0
-  flutter: ">=3.24.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
   ffi: ^2.1.3
   meta: ^1.15.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  test: ^1.25.0
   ffigen: ^20.1.1
-  flutter_lints: ^5.0.0
-
-flutter:
-  plugin:
-    platforms:
-      android:
-        ffiPlugin: true
-      ios:
-        ffiPlugin: true
-      linux:
-        ffiPlugin: true
-      macos:
-        ffiPlugin: true
-      windows:
-        ffiPlugin: true
+  lints: ^5.0.0
 
 topics:
   - webrtc
